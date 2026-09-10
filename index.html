@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Sméan — Spin to Win!</title>
+<title>Smean — Spin to Win!</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
@@ -302,11 +302,10 @@
     </div>
 
     <div class="hub" id="hub">
-      <img src="assets/centerlogo.png" style="width:60%; height:auto;" alt="Sméan Logo" class="logo">
+      <img src="assets\centerlogo.png" style="width:60%; height:auto;" alt="Sméan Logo" class="logo">
     </div>
   </div>
 
-  <button class="spin-btn" id="spinBtn">SPIN THE WHEEL</button>
 </div>
 
 <div class="modal-overlay" id="modalOverlay">
@@ -329,12 +328,12 @@
    ========================================================= */
 const SLICES = [
   { key:'1h',    label:['1H CREDITS','$1 PACKAGE'], icon:'assets/icons/wallet.png', fill:'#ffffff', text:'#161616', badge:'#0f6d5f' },
-  { key:'5',     label:['PREMIUM','$5 PACKAGE'],     icon:'assets/icons/dollar.png', fill:'#ffffff', text:'#161616', badge:'#cf9a35', badgeSize:12, gold:true },
+  { key:'5',     label:['PREMIUM','$5 PACKAGE'],     icon:'assets/icons/dollar.png', fill:'#fff1b8', text:'#161616', badge:'#cf9a35', labelSize:16, badgeSize:14, badgeWidth:105, gold:true },
   { key:'1h',    label:['1H CREDITS','$1 PACKAGE'], icon:'assets/icons/wallet.png', fill:'#ffffff', text:'#161616', badge:'#0f6d5f' },
   { key:'2h',    label:['2H CREDITS','$2 PACKAGE'],icon:'assets/icons/gift.png', fill:'#0f6d5f', text:'#ffffff', badge:'#ffffff', badgeText:'#0f6d5f' },
   { key:'1h',    label:['1H CREDITS','$1 PACKAGE'], icon:'assets/icons/wallet.png', fill:'#ffffff', text:'#161616', badge:'#0f6d5f' },
   { key:'2h',    label:['2H CREDITS','$2 PACKAGE'],icon:'assets/icons/gift.png', fill:'#0f6d5f', text:'#ffffff', badge:'#ffffff', badgeText:'#0f6d5f' },
-  { key:'bottle',label:['TUMBLR','Smean'],           icon:'assets/icons/bottles.png', fill:'#ffffff', text:'#0f6d5f', badge:'#cf9a35', badgeTextC:'#ffffff', gold:true },
+  { key:'bottle',label:['TUMBLR','Smean'],           icon:'assets/icons/bottles.png', iconSize:52, fill:'#ffffff', text:'#0f6d5f', badge:'#cf9a35', badgeTextC:'#ffffff', gold:true },
   { key:'2h',    label:['2H CREDITS','$2 PACKAGE'],icon:'assets/icons/gift.png', fill:'#0f6d5f', text:'#ffffff', badge:'#ffffff', badgeText:'#0f6d5f' },
 ];
 
@@ -342,8 +341,8 @@ const SLICES = [
 const PROBS = { '1h':0.60, '2h':0.30, '5':0.09, 'bottle':0.01 };
 
 const PRIZE_META = {
-  '1h':     { icon:'assets/icons/smean-blue.png', title:'You won 1H Credits!',      sub:'1 hour of transcription credits will be added to your account.' },
-  '2h':     { icon:'assets/icons/smean-blue.png', title:'You won 2H Credits!',      sub:'2 hours of transcription credits will be added to your account.' },
+  '1h':     { icon:'assets/icons/wallet.png', title:'You won 1H Credits!',      sub:'1 hour of transcription credits will be added to your account.' },
+  '2h':     { icon:'assets/icons/gift.png', title:'You won 2H Credits!',      sub:'2 hours of transcription credits will be added to your account.' },
   '5':      { icon:'assets/icons/dollar.png', title:'You won the $5 Premium Package!', sub:'Our team will reach out to activate your premium package.' },
   'bottle': { icon:'assets/icons/bottles.png', title:'You won a Smean Tumbler!', sub:'Congrats! Show this to claim your bottle.' },
 };
@@ -380,11 +379,12 @@ function buildWheel(){
     /* icon */
     const iconPos = polar(CX, CY, R*0.46, mid);
     if (s.icon.endsWith('.png')) {
+      const iconSize = s.iconSize || 40;
       html += `<image href="${s.icon}"
-        x="${(iconPos.x - 20).toFixed(2)}"
-        y="${(iconPos.y - 35).toFixed(2)}"
-        width="40"
-        height="40"
+        x="${(iconPos.x - iconSize / 2).toFixed(2)}"
+        y="${(iconPos.y - iconSize / 1.5).toFixed(2)}"
+        width="${iconSize}"
+        height="${iconSize}"
         preserveAspectRatio="xMidYMid meet"
         transform="rotate(${mid}, ${iconPos.x.toFixed(2)}, ${iconPos.y.toFixed(2)})"/>`;
     } else {
@@ -396,7 +396,7 @@ function buildWheel(){
     /* main label line */
     const l1Pos = polar(CX, CY, R*0.72, mid);
     html += `<text x="${l1Pos.x.toFixed(2)}" y="${l1Pos.y.toFixed(2)}"
-              font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="14.5"
+              font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="${s.labelSize || 14.5}"
               fill="${s.text}" text-anchor="middle" dominant-baseline="middle"
               transform="rotate(${mid}, ${l1Pos.x.toFixed(2)}, ${l1Pos.y.toFixed(2)})">${s.label[0]}</text>`;
 
@@ -404,13 +404,16 @@ function buildWheel(){
     const badgePos = polar(CX, CY, R*0.855, mid);
     const badgeFill = s.badge;
     const badgeTxt = s.badgeText || s.badgeTextC || '#ffffff';
-    const pillW = s.label[1].length * 6.4 + 20;
+    const pillW = s.badgeWidth || (s.label[1].length * 6.4 + 20);
+    const badgeMarkup = s.key === '5'
+      ? `<tspan font-size="18">$5</tspan><tspan font-size="${s.badgeSize || 10}"> PACKAGE</tspan>`
+      : s.label[1];
     html += `<g transform="rotate(${mid}, ${badgePos.x.toFixed(2)}, ${badgePos.y.toFixed(2)})">
                 <rect x="${(badgePos.x - pillW/2).toFixed(2)}" y="${(badgePos.y-10).toFixed(2)}"
                       width="${pillW.toFixed(2)}" height="20" rx="10" fill="${badgeFill}"/>
                 <text x="${badgePos.x.toFixed(2)}" y="${(badgePos.y+1).toFixed(2)}"
                       font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="${s.badgeSize || 10}"
-                      fill="${badgeTxt}" text-anchor="middle" dominant-baseline="middle">${s.label[1]}</text>
+                      fill="${badgeTxt}" text-anchor="middle" dominant-baseline="middle">${badgeMarkup}</text>
               </g>`;
   });
 
@@ -453,7 +456,6 @@ function slicesForKey(key){
 function spin(){
   if (spinning) return;
   spinning = true;
-  document.getElementById('spinBtn').disabled = true;
   document.getElementById('hub').classList.add('disabled');
 
   const prizeKey = weightedPick();
@@ -477,7 +479,6 @@ function spin(){
   setTimeout(() => {
     showWinner(prizeKey);
     spinning = false;
-    document.getElementById('spinBtn').disabled = false;
     document.getElementById('hub').classList.remove('disabled');
   }, 4300);
 }
@@ -495,7 +496,6 @@ function showWinner(key){
   document.getElementById('modalOverlay').classList.add('show');
 }
 
-document.getElementById('spinBtn').addEventListener('click', spin);
 document.getElementById('hub').addEventListener('click', spin);
 document.getElementById('modalClose').addEventListener('click', () => {
   document.getElementById('modalOverlay').classList.remove('show');
